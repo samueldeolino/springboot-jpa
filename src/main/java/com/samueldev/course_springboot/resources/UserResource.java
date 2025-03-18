@@ -1,19 +1,20 @@
 package com.samueldev.course_springboot.resources;
 import com.samueldev.course_springboot.entities.User;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/users")
 public class UserResource {
 
     @GetMapping
-    public ResponseEntity<User> findById() {
-
-        User user = new User(1L, "Samuel", "samuel@gmail.com");
-
+    public ResponseEntity<User> findAll(Long id) {
+        User user = new User(1L, "Samuel", "Samuelgmail.com");
         return ResponseEntity.ok().body(user);
     }
+
+//    @PostMapping
+//    public ResponseEntity<User> saveUser(@RequestBody User user) {
+//        return
+//    }
 }
