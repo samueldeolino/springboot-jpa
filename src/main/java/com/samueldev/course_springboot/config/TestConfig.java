@@ -2,10 +2,12 @@ package com.samueldev.course_springboot.config;
 
 import com.samueldev.course_springboot.entities.Category;
 import com.samueldev.course_springboot.entities.Order;
+import com.samueldev.course_springboot.entities.Product;
 import com.samueldev.course_springboot.entities.User;
 import com.samueldev.course_springboot.entities.enums.OrderStatus;
 import com.samueldev.course_springboot.repositories.CategoryRepository;
 import com.samueldev.course_springboot.repositories.OrderRepository;
+import com.samueldev.course_springboot.repositories.ProductRepository;
 import com.samueldev.course_springboot.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -28,6 +30,9 @@ public class TestConfig implements CommandLineRunner {
     @Autowired
     private OrderRepository orderRepository;
 
+    @Autowired
+    private ProductRepository productRepository;
+
     @Override
     public void run(String... args) throws Exception {
         User user1 = new User(null, "John", "Jhon@gmail.com", "jhon123", "5512345678");
@@ -39,10 +44,23 @@ public class TestConfig implements CommandLineRunner {
 
         Category category1 = new Category(null, "Electronic");
         Category category2 = new Category(null, "Food");
-        Category category3 = new Category(null, "Supplements");
+        Category category3 = new Category(null, "Computers");
+
+        Product p1 = new Product(null, "Acer nitro V15", "Notebook Gamer", 3200.2, "");
+        Product p2 = new Product(null, "Dell Vostro", "Notebook", 23093.99, "");
+        Product p3 = new Product(null, "Apple", "Delicious food", 5.0, "");
 
         userRepository.saveAll(Arrays.asList(user1, user2));
         orderRepository.saveAll(Arrays.asList(order1, order2, order3));
         categoryRepository.saveAll(Arrays.asList(category1, category2, category3));
+        productRepository.saveAll(Arrays.asList(p1, p2, p3));
+
+        p1.getCategories().add(category1);
+        p1.getCategories().add(category3);
+        p2.getCategories().add(category1);
+        p2.getCategories().add(category3);
+        p3.getCategories().add(category2);
+
+        productRepository.saveAll(Arrays.asList(p1, p2, p3));
     }
 }
