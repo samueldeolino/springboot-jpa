@@ -18,7 +18,7 @@ import java.time.Instant;
 import java.util.Arrays;
 
 @Configuration
-@Profile("postgre")
+@Profile("postgres")
 public class TestConfig implements CommandLineRunner {
 
     @Autowired
