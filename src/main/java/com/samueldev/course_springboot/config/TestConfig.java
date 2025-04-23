@@ -30,6 +30,9 @@ public class TestConfig implements CommandLineRunner {
     @Autowired
     private OrderItemRepository orderItemRepository;
 
+    @Autowired
+    private PaymentRepository paymentRepository;
+
     @Override
     public void run(String... args) throws Exception {
         User user1 = new User(null, "John", "Jhon@gmail.com", "jhon123", "5512345678");
@@ -62,8 +65,16 @@ public class TestConfig implements CommandLineRunner {
 
         OrderItem orderItem1 = new OrderItem(order1, p1, p1.getPrice(), 1);
         OrderItem orderItem2 = new OrderItem(order2, p3, p3.getPrice(), 2);
-        OrderItem orderItem3 = new OrderItem(order1, p1, p1.getPrice(), 1);
+        OrderItem orderItem3 = new OrderItem(order1, p3, p3.getPrice(), 1);
 
         orderItemRepository.saveAll(Arrays.asList(orderItem1, orderItem2, orderItem3));
+
+        Payment pay1 = new Payment(null, Instant.parse("2025-04-14T12:06:20Z"), order1);
+        Payment pay2 = new Payment(null, Instant.parse("2025-04-06T11:32:20Z"), order2);
+
+        order1.setPayment(pay1);
+        order2.setPayment(pay2);
+
+        orderRepository.saveAll(Arrays.asList(order1, order2));
     }
 }
