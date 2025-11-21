@@ -1,0 +1,183 @@
+# Kubernetes Deployment Configuration
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: springboot-api
+---
+# Secret for Database Credentials
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-credentials
+  namespace: springboot-api
+type: Opaque
+stringData:
+  database-url: jdbc:postgresql://postgres-service:5432/spring-test
+  database-username: admin
+  database-password: admin
+---
+# PostgreSQL Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: springboot-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:17.4-alpine3.21
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_DB
+          value: spring-test
+        - name: POSTGRES_USER
+          value: admin
+        - name: POSTGRES_PASSWORD
+          value: admin
+        volumeMounts:
+        - name: postgres-storage
+          mountPath: /var/lib/postgresql/data
+      volumes:
+      - name: postgres-storage
+        persistentVolumeClaim:
+          claimName: postgres-pvc
+---
+# PostgreSQL Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+  namespace: springboot-api
+spec:
+  selector:
+    app: postgres
+  ports:
+  - port: 5432
+    targetPort: 5432
+  type: ClusterIP
+---
+# PostgreSQL PVC
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+  namespace: springboot-api
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+# Spring Boot Application Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springboot-api
+  namespace: springboot-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: springboot-api
+  template:
+    metadata:
+      labels:
+        app: springboot-api
+    spec:
+      containers:
+      - name: springboot-api
+        # IMPORTANT: Replace 'latest' with a specific version tag in production (e.g., 'v1.0.0')
+        image: your-registry/springboot-jpa-api:v1.0.0
+        ports:
+        - containerPort: 8080
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: "prod"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: database-url
+        - name: DATABASE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: database-username
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: database-password
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            # Using /users endpoint as health check since actuator is not included
+            # For production, consider adding spring-boot-starter-actuator and use /actuator/health
+            path: /users
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /users
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 5
+---
+# Spring Boot Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: springboot-api-service
+  namespace: springboot-api
+spec:
+  selector:
+    app: springboot-api
+  ports:
+  - port: 80
+    targetPort: 8080
+  type: LoadBalancer
+---
+# Horizontal Pod Autoscaler
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: springboot-api-hpa
+  namespace: springboot-api
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: springboot-api
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
