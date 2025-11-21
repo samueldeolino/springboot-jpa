@@ -1,0 +1,40 @@
+[Unit]
+Description=Spring Boot JPA REST API
+After=syslog.target network.target
+
+[Service]
+User=springboot
+Group=springboot
+
+Type=simple
+
+# Path to the JAR file
+ExecStart=/usr/bin/java -jar /opt/springboot-api/course-springboot-0.0.1-SNAPSHOT.jar
+
+# Environment variables
+Environment="SPRING_PROFILES_ACTIVE=prod"
+Environment="DATABASE_URL=jdbc:postgresql://localhost:5432/spring-test"
+Environment="DATABASE_USERNAME=admin"
+Environment="DATABASE_PASSWORD=admin"
+
+# Working directory
+WorkingDirectory=/opt/springboot-api
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=springboot-api
+
+# Restart policy
+Restart=on-failure
+RestartSec=10
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+
+# Resource limits
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

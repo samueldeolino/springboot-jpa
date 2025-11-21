@@ -11,6 +11,36 @@ services:
       POSTGRES_DB: spring-test
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
+    networks:
+      - springboot-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d spring-test"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: springboot-api
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: postgres
+      DATABASE_URL: jdbc:postgresql://postgres:5432/spring-test
+      DATABASE_USERNAME: admin
+      DATABASE_PASSWORD: admin
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - springboot-network
+
+networks:
+  springboot-network:
+    driver: bridge
 
 volumes:
   pgdata:
