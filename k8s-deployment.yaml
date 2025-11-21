@@ -97,7 +97,8 @@ spec:
     spec:
       containers:
       - name: springboot-api
-        image: your-registry/springboot-jpa-api:latest
+        # IMPORTANT: Replace 'latest' with a specific version tag in production (e.g., 'v1.0.0')
+        image: your-registry/springboot-jpa-api:v1.0.0
         ports:
         - containerPort: 8080
         env:
@@ -127,13 +128,15 @@ spec:
             cpu: "500m"
         livenessProbe:
           httpGet:
-            path: /actuator/health
+            # Using /users endpoint as health check since actuator is not included
+            # For production, consider adding spring-boot-starter-actuator and use /actuator/health
+            path: /users
             port: 8080
           initialDelaySeconds: 60
           periodSeconds: 10
         readinessProbe:
           httpGet:
-            path: /actuator/health
+            path: /users
             port: 8080
           initialDelaySeconds: 30
           periodSeconds: 5

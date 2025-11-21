@@ -118,7 +118,8 @@ eb deploy
 #### Azure App Service
 
 ```bash
-az webapp up --name springboot-api --resource-group meu-grupo --runtime "JAVA:21-java21"
+# Create and deploy to Azure App Service
+az webapp up --name springboot-api --resource-group meu-grupo --runtime "JAVA|21-java21"
 ```
 
 ### Método 5: Deploy com Kubernetes
@@ -227,7 +228,8 @@ journalctl -u springboot-api -f
 ```
 
 ### Endpoints de Health Check
-Adicione Spring Boot Actuator para monitoramento:
+
+**Nota:** A aplicação atual não inclui Spring Boot Actuator. Para adicionar monitoramento avançado, adicione a dependência no `pom.xml`:
 
 ```xml
 <dependency>
@@ -236,10 +238,14 @@ Adicione Spring Boot Actuator para monitoramento:
 </dependency>
 ```
 
-Endpoints disponíveis:
+Após adicionar o Actuator, endpoints de monitoramento estarão disponíveis:
 - `/actuator/health` - Status da aplicação
 - `/actuator/info` - Informações da aplicação
 - `/actuator/metrics` - Métricas
+
+**Enquanto isso**, você pode usar os endpoints REST existentes para verificar se a aplicação está funcionando:
+- `GET /users` - Retorna lista de usuários
+- `GET /products` - Retorna lista de produtos
 
 ## 🔒 Segurança
 

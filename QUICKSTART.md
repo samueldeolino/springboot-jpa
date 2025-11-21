@@ -88,11 +88,12 @@ export PORT=8080
 ## 📊 Verificar Status
 
 ```bash
-# Verificar se a aplicação está rodando
-curl http://localhost:8080/actuator/health
+# Verificar se a aplicação está rodando (use qualquer endpoint REST)
+curl http://localhost:8080/users
 
-# Ver métricas (se actuator estiver habilitado)
-curl http://localhost:8080/actuator/metrics
+# Se você adicionar spring-boot-starter-actuator, use:
+# curl http://localhost:8080/actuator/health
+# curl http://localhost:8080/actuator/metrics
 ```
 
 ## 🛠️ Solução de Problemas

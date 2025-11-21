@@ -8,8 +8,9 @@ Group=springboot
 
 Type=simple
 
-# Path to the JAR file
-ExecStart=/usr/bin/java -jar /opt/springboot-api/course-springboot-0.0.1-SNAPSHOT.jar
+# Path to the JAR file (using symlink for easy version updates)
+# Create symlink: ln -s /opt/springboot-api/course-springboot-0.0.1-SNAPSHOT.jar /opt/springboot-api/app.jar
+ExecStart=/usr/bin/java -jar /opt/springboot-api/app.jar
 
 # Environment variables
 Environment="SPRING_PROFILES_ACTIVE=prod"
