@@ -119,7 +119,8 @@ eb deploy
 
 ```bash
 # Create and deploy to Azure App Service
-az webapp up --name springboot-api --resource-group meu-grupo --runtime "JAVA|21-java21"
+# Note: Azure App Service supports Java 21 runtime
+az webapp up --name springboot-api --resource-group meu-grupo --runtime "JAVA:21"
 ```
 
 ### Método 5: Deploy com Kubernetes

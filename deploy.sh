@@ -29,7 +29,14 @@ check_java() {
     print_info "Verificando instalação do Java..."
     if command -v java &> /dev/null; then
         # Get Java version - works with both old (1.8) and new (9+) version formats
-        JAVA_VERSION=$(java -version 2>&1 | grep -i version | head -n 1 | sed 's/.*version "\(.*\)".*/\1/' | sed 's/^1\.//' | cut -d'.' -f1)
+        # Extract version and handle both "1.8" format and "21.0.1" format
+        JAVA_VERSION_STRING=$(java -version 2>&1 | grep -i version | head -n 1 | sed 's/.*version "\(.*\)".*/\1/')
+        # Remove '1.' prefix for old versions (1.8 -> 8), keep as-is for new versions (21 -> 21)
+        if [[ "$JAVA_VERSION_STRING" == 1.* ]]; then
+            JAVA_VERSION=$(echo "$JAVA_VERSION_STRING" | sed 's/^1\.//' | cut -d'.' -f1)
+        else
+            JAVA_VERSION=$(echo "$JAVA_VERSION_STRING" | cut -d'.' -f1)
+        fi
         print_info "Java versão $JAVA_VERSION encontrado"
         if [ "$JAVA_VERSION" -lt 21 ]; then
             print_error "Java 21 ou superior é necessário. Versão atual: $JAVA_VERSION"
